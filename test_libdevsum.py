@@ -18,6 +18,9 @@ def test_validator_commandavailable():
 
 def test_validator_linted():
     """Test Validator.linted() ."""
+    assert Validator.linted(__file__)
+    assert Validator.linted('libdevsum')
+    assert Validator.linted('setup.py')
     assert Validator.linted('fixtures/linted_file.py')
     assert not Validator.linted('fixtures/not_linted_file.py')
 
