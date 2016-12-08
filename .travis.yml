@@ -1,2 +1,5 @@
 language: python
+install:
+  - pip install -U pytest
+  - pip install -r test_requirements.txt
 script: pytest
