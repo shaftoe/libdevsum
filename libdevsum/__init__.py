@@ -77,13 +77,12 @@ class Validator(object):
             return False
 
 
-# pylint: disable=too-few-public-methods
 class Repo(object):
     """Class wrapper for Git tasks utilities."""
 
     @staticmethod
-    def get_remote_references(git_repo, regexp=r'.*'):
-        """Fetch remote references and return list with ref names."""
+    def get_remote_tags(git_repo, regexp=r'.*'):
+        """Fetch remote tags references and return list with ref names."""
         from re import match
         from subprocess import check_output
 
@@ -92,4 +91,13 @@ class Repo(object):
 
         return [ref.split('\t')[1] for ref in raw_output.split('\n')
                 if match(regexp, ref.split('\t')[1])]
-# pylint: enable=too-few-public-methods
+
+    @staticmethod
+    def get_latest_remote_tag(git_repo, regexp):
+        """Return latest tags matching regexp."""
+        from re import match
+
+        tags = Repo.get_remote_tags(git_repo, regexp)
+
+        if tags:
+            return match(regexp, tags[-1]).groups()[0]
