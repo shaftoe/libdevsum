@@ -75,3 +75,21 @@ class Validator(object):
             return all(returncodes)
         except CalledProcessError:
             return False
+
+
+# pylint: disable=too-few-public-methods
+class Repo(object):
+    """Class wrapper for Git tasks utilities."""
+
+    @staticmethod
+    def get_remote_references(git_repo, regexp=r'.*'):
+        """Fetch remote references and return list with ref names."""
+        from re import match
+        from subprocess import check_output
+
+        raw_output = check_output(['git', 'ls-remote', '--tags',
+                                   git_repo]).rstrip()
+
+        return [ref.split('\t')[1] for ref in raw_output.split('\n')
+                if match(regexp, ref.split('\t')[1])]
+# pylint: enable=too-few-public-methods
