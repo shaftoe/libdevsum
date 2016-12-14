@@ -1,5 +1,5 @@
 """Unit tests."""
-from libdevsum import (Validator, TempDownloader)
+from libdevsum import (PROJECT_URL, Repo, Validator, TempDownloader)
 
 
 def test_validator_semver():
@@ -30,3 +30,25 @@ def test_temp_downloader():
     from os.path import isfile
     with TempDownloader(__file__) as downloaded:
         assert isfile(downloaded)
+
+
+def test_repo_remote_tags():
+    """Test Repo.get_remote_tags()."""
+    regexp = r'^refs/tags/test\d+'
+    test_tags = ['refs/tags/test01', 'refs/tags/test02']
+    assert Repo.get_remote_tags(PROJECT_URL, regexp) == test_tags
+
+    regexp = r'^notExistent$'
+    assert Repo.get_remote_tags(PROJECT_URL, regexp) == []
+
+
+def test_repo_latest_tag():
+    """Test Repo.get_latest_remote_tag()."""
+    regexp = r'^refs/tags/test(\d+)'
+    assert Repo.get_latest_remote_tag(PROJECT_URL, regexp) == '02'
+
+    regexp = r'^notExistent$'
+    assert Repo.get_latest_remote_tag(PROJECT_URL, regexp) is None
+
+    regexp = r'^(notExistentWithGroup)$'
+    assert Repo.get_latest_remote_tag(PROJECT_URL, regexp) is None

@@ -2,6 +2,9 @@
 from __future__ import print_function
 
 
+PROJECT_URL = 'https://github.com/shaftoe/libdevsum'
+
+
 # pylint: disable=too-few-public-methods
 class TempDownloader(object):
     """Context manager to ease download with tempfiles."""
@@ -90,7 +93,8 @@ class Repo(object):
                                    git_repo]).rstrip()
 
         return [ref.split('\t')[1] for ref in raw_output.split('\n')
-                if match(regexp, ref.split('\t')[1])]
+                if len(ref.split('\t')) == 2 and match(regexp,
+                                                       ref.split('\t')[1])]
 
     @staticmethod
     def get_latest_remote_tag(git_repo, regexp):
@@ -99,5 +103,5 @@ class Repo(object):
 
         tags = Repo.get_remote_tags(git_repo, regexp)
 
-        if tags:
-            return match(regexp, tags[-1]).groups()[0]
+        if tags and match(regexp, tags[-1]).groups():
+            return match(regexp, tags[-1]).group(1)
