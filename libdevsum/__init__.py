@@ -1,7 +1,7 @@
 """Devsum utils lib."""
 from __future__ import print_function
 
-
+__version__ = '0.1.0'
 PROJECT_URL = 'https://github.com/shaftoe/libdevsum'
 
 
