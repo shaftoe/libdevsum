@@ -1,8 +1,9 @@
 """Devsum utils lib."""
 from __future__ import print_function
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 PROJECT_URL = 'https://github.com/shaftoe/libdevsum'
+SEMVER_MATCH = r'\d+\.\d+\.\d+'
 
 
 # pylint: disable=too-few-public-methods
@@ -40,19 +41,28 @@ class Validator(object):
         """Return true if version is a valid segver version string."""
         from re import match
         try:
-            return bool(match(r'^\d+\.\d+\.\d+$', version))
+            return bool(match(r'^%s$' % SEMVER_MATCH, version))
         except TypeError:
             return False
 
     @staticmethod
-    def command_available(command):
-        """Return true if command is available in current PATH."""
+    def command_available(command, abort=False):
+        """Return true if command is available in current PATH.
+
+        If optional boolean value ``abort`` is set, raise an IOError
+        exception when command is not found or not executable.
+        """
         # pylint: disable=no-name-in-module,import-error
         # We need to disable some pylint checks here:
         # https://github.com/PyCQA/pylint/issues/73
         from distutils.spawn import find_executable
         # pylint: enable=no-name-in-module,import-error
-        return bool(find_executable(command))
+        if bool(find_executable(command)):
+            return True
+        elif abort:
+            raise IOError('"%s" not found or not executable' % command)
+        else:
+            return False
 
     @staticmethod
     def linted(filepath):
@@ -86,6 +96,8 @@ class Repo(object):
     @staticmethod
     def get_remote_tags(git_repo, regexp=r'.*'):
         """Fetch remote tags references and return list with ref names."""
+        Validator.command_available('git', abort=True)
+
         from re import match
         from subprocess import check_output
 

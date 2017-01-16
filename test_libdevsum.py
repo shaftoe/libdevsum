@@ -1,5 +1,9 @@
 """Unit tests."""
-from libdevsum import (PROJECT_URL, Repo, Validator, TempDownloader)
+# pylint: disable=import-error
+import pytest
+# pylint: enable=import-error
+from libdevsum import (PROJECT_URL, Repo, SEMVER_MATCH, TempDownloader,
+                       Validator, __version__)
 
 
 def test_validator_semver():
@@ -14,6 +18,8 @@ def test_validator_commandavailable():
     """Test Validator.command_available() ."""
     assert Validator.command_available('python')
     assert not Validator.command_available('C:> troll.exe')
+    with pytest.raises(IOError):
+        Validator.command_available('C:> troll.exe', abort=True)
 
 
 def test_validator_linted():
@@ -52,3 +58,16 @@ def test_repo_latest_tag():
 
     regexp = r'^(notExistentWithGroup)$'
     assert Repo.get_latest_remote_tag(PROJECT_URL, regexp) is None
+
+
+def test_changelog_uptodate():
+    """Test that CHANGELOG.md has been updated with latest __version__."""
+    from re import findall
+
+    match_string = r'## \[(%s)\]' % SEMVER_MATCH
+
+    with open('CHANGELOG.md') as changelog:
+        matches = findall(match_string, changelog.read())
+
+    assert len(matches) > 0
+    assert matches[0] == __version__
